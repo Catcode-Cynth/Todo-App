@@ -1,43 +1,60 @@
+/**
+ * Todo App Main Application File
+ * Sets up Express server, middleware, routes, and database connection
+ */
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-const methodOverride = require("method-override"); // Allow HTML forms to simulate PUT/DELETE
-const session = require("express-session"); // Session middleware
+const methodOverride = require("method-override");
+const session = require("express-session");
 const logger = require("./utils/logger");
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
+// Load environment variables from .env file
 dotenv.config();
 const app = express();
 
-// -------------------- Middleware --------------------
-app.use(express.json()); // Parse incoming JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parse form data from HTML forms
-app.use(cors()); // Enable cross-origin requests
-app.use(morgan("dev")); // Log HTTP requests in development format
-app.use(logger); // Custom logger middleware
-app.use(methodOverride("_method")); // Allow HTML forms to send PUT/DELETE requests
+// ==================== MIDDLEWARE ====================
 
-// -------------------- Session Configuration --------------------
+// Parse JSON and form data from requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Enable CORS for cross-origin requests
+app.use(cors());
+
+// Log HTTP requests in development format
+app.use(morgan("dev"));
+
+// Custom request logger middleware
+app.use(logger);
+
+// Allow HTML forms to send PUT/DELETE requests via _method field
+app.use(methodOverride("_method"));
+
+// ==================== SESSION CONFIGURATION ====================
+
 const sessionConfig = {
-  secret: process.env.SESSION_SECRET || "supersecret", // Key used to sign the session ID cookie
-  resave: false, // Prevents resaving unchanged sessions
-  saveUninitialized: false, // Prevents saving empty sessions
+  secret: process.env.SESSION_SECRET || "supersecret",
+  resave: false,
+  saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60, // Session cookie lifespan: 1 hour
+    maxAge: 1000 * 60 * 60, // 1 hour
   },
 };
 
-// Only use MongoStore in production, not in development/tests
+// Use MongoDB session store in production
 if (process.env.NODE_ENV === "production") {
   try {
     const MongoStore = require("connect-mongo");
     sessionConfig.store = new MongoStore({
-      mongoUrl: process.env.MONGO_URI, // MongoDB connection string for storing sessions
-      collectionName: "sessions", // Collection name where sessions are stored
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
     });
   } catch (err) {
     console.warn("MongoStore not available, using memory store:", err.message);
@@ -46,27 +63,46 @@ if (process.env.NODE_ENV === "production") {
 
 app.use(session(sessionConfig));
 
-// -------------------- API Routes --------------------
-app.use("/api/auth", authRoutes); // Routes for user registration and login
-app.use("/api/tasks", taskRoutes); // Routes for task CRUD operations
+// ==================== API ROUTES ====================
 
-// -------------------- View Engine Setup --------------------
-app.set("view engine", "ejs"); // Use EJS as the template engine
-app.set("views", __dirname + "/views"); // Directory containing EJS templates
+// Authentication endpoints: /api/auth/register, /api/auth/login
+app.use("/api/auth", authRoutes);
 
-// -------------------- View Routes --------------------
+// Task endpoints: /api/tasks (CRUD operations)
+app.use("/api/tasks", taskRoutes);
+
+// ==================== VIEW ENGINE SETUP ====================
+
+// Use EJS templating engine for server-side rendering
+app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
+
+// ==================== ROOT ROUTE ====================
+
+// Simple welcome message for API root
+app.get("/", (req, res) => {
+  res.send("Welcome to the Todo App! The API is live 🚀");
+});
+
+// ==================== VIEW ROUTES ====================
+
+// Render pages (register, login, dashboard)
 const viewRoutes = require("./routes/viewRoutes");
-app.use("/", viewRoutes); // Routes that render EJS templates (register, login, tasks UI)
+app.use("/", viewRoutes);
 
-// -------------------- Error Handler --------------------
-app.use(errorHandler); // Centralized error handling middleware
+// ==================== ERROR HANDLING ====================
 
-// -------------------- MongoDB Connection --------------------
+// Global error handler - must be last
+app.use(errorHandler);
+
+// ==================== DATABASE CONNECTION ====================
+
+// Connect to MongoDB (skip in test environment)
 if (process.env.NODE_ENV !== "test") {
   mongoose
-    .connect(process.env.MONGO_URI) // Connect to MongoDB using URI from environment variables
-    .then(() => console.log("MongoDB connected")) // Log success message
-    .catch((err) => console.error(err)); // Log error if connection fails
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error(err));
 }
 
 module.exports = app;
