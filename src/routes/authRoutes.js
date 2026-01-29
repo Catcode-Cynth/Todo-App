@@ -3,8 +3,8 @@
  * Handles user registration and login endpoints
  */
 
-const express = require('express');
-const { register, login } = require('../controllers/authController');
+const express = require("express");
+const { register, login } = require("../controllers/authController");
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const router = express.Router();
  * Register a new user
  * Body: { username: string, password: string }
  */
-router.post('/register', register);
+router.post("/register", register);
 
 /**
  * POST /api/auth/login
@@ -21,6 +21,6 @@ router.post('/register', register);
  * Body: { username: string, password: string }
  * Response: { token: string }
  */
-router.post('/login', login);
+router.post("/login", login);
 
 module.exports = router;

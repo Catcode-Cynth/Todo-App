@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register</title>
+  <title>Register | TodoApp</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <h1>Register</h1>
   <% if (locals.error) { %>
     <p style="color: red;"><%= error %></p>
   <% } %>
+
   <form action="/register" method="POST">
     <label>Username:</label>
     <input type="text" name="username" required />
@@ -17,6 +19,7 @@
     <br/>
     <button type="submit">Register</button>
   </form>
-  <p>Already have an account? <a href="/login">Login here</a></p>
+
+  <p>Already have an account? <a href="/login">Login</a></p>
 </body>
 </html>

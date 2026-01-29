@@ -8,22 +8,22 @@ const mongoose = require("mongoose");
 // Define Task schema
 const taskSchema = new mongoose.Schema(
   {
-    title: { 
-      type: String, 
-      required: true 
+    title: {
+      type: String,
+      required: true,
     },
     status: {
       type: String,
       enum: ["pending", "completed", "deleted"], // Only allow these values
-      default: "pending" // New tasks start as pending
+      default: "pending", // New tasks start as pending
     },
-    user: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User" // Reference to User model for ownership
-    }
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to User model for ownership
+    },
   },
-  { 
-    timestamps: true // Automatically add createdAt and updatedAt fields
+  {
+    timestamps: true, // Automatically add createdAt and updatedAt fields
   },
 );
 

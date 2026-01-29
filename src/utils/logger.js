@@ -6,7 +6,7 @@
 /**
  * Logger middleware function
  * Logs request details: method, url, timestamp
- * 
+ *
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware function

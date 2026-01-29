@@ -3,7 +3,7 @@
  * Handles CRUD operations for tasks (Create, Read, Update, Delete)
  */
 
-const Task = require('../models/Task');
+const Task = require("../models/Task");
 
 /**
  * Create a new task
@@ -14,14 +14,16 @@ const Task = require('../models/Task');
 exports.createTask = async (req, res) => {
   try {
     const { title } = req.body;
-    
+
     // Create task associated with authenticated user
     const task = new Task({ title, user: req.user.id });
     await task.save();
-    
+
     res.status(201).json(task);
   } catch (err) {
-    res.status(400).json({ error: 'Task creation failed', details: err.message });
+    res
+      .status(400)
+      .json({ error: "Task creation failed", details: err.message });
   }
 };
 
@@ -37,7 +39,9 @@ exports.getTasks = async (req, res) => {
     const tasks = await Task.find({ user: req.user.id });
     res.json(tasks);
   } catch (err) {
-    res.status(400).json({ error: 'Fetching tasks failed', details: err.message });
+    res
+      .status(400)
+      .json({ error: "Fetching tasks failed", details: err.message });
   }
 };
 
@@ -50,18 +54,18 @@ exports.getTasks = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { status } = req.body;
-    
+
     // Update only if task belongs to authenticated user
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
       { status },
-      { new: true } // Return updated document
+      { new: true }, // Return updated document
     );
-    
-    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    if (!task) return res.status(404).json({ error: "Task not found" });
     res.json(task);
   } catch (err) {
-    res.status(400).json({ error: 'Update failed', details: err.message });
+    res.status(400).json({ error: "Update failed", details: err.message });
   }
 };
 
@@ -73,11 +77,14 @@ exports.updateTask = async (req, res) => {
 exports.deleteTask = async (req, res) => {
   try {
     // Delete only if task belongs to authenticated user
-    const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    
-    if (!task) return res.status(404).json({ error: 'Task not found' });
-    res.json({ message: 'Task deleted' });
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!task) return res.status(404).json({ error: "Task not found" });
+    res.json({ message: "Task deleted" });
   } catch (err) {
-    res.status(400).json({ error: 'Delete failed', details: err.message });
+    res.status(400).json({ error: "Delete failed", details: err.message });
   }
 };

@@ -3,14 +3,14 @@
  * All task endpoints require authentication via authMiddleware
  */
 
-const express = require('express');
+const express = require("express");
 const {
   createTask,
   getTasks,
   updateTask,
-  deleteTask
-} = require('../controllers/taskController');
-const authMiddleware = require('../middleware/authMiddleware');
+  deleteTask,
+} = require("../controllers/taskController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -20,14 +20,14 @@ const router = express.Router();
  * Requires: Valid JWT token in Authorization header
  * Body: { title: string }
  */
-router.post('/', authMiddleware, createTask);
+router.post("/", authMiddleware, createTask);
 
 /**
  * GET /api/tasks
  * Get all tasks for the logged-in user
  * Requires: Valid JWT token in Authorization header
  */
-router.get('/', authMiddleware, getTasks);
+router.get("/", authMiddleware, getTasks);
 
 /**
  * PUT /api/tasks/:id
@@ -35,13 +35,13 @@ router.get('/', authMiddleware, getTasks);
  * Requires: Valid JWT token in Authorization header
  * Body: { status: "pending" | "completed" | "deleted" }
  */
-router.put('/:id', authMiddleware, updateTask);
+router.put("/:id", authMiddleware, updateTask);
 
 /**
  * DELETE /api/tasks/:id
  * Delete a task permanently
  * Requires: Valid JWT token in Authorization header
  */
-router.delete('/:id', authMiddleware, deleteTask);
+router.delete("/:id", authMiddleware, deleteTask);
 
 module.exports = router;
