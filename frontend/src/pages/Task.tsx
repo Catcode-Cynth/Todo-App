@@ -57,7 +57,7 @@ export default function TaskDashboard() {
   const fetchTasks = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:8080/api/tasks", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
       if (!res.ok) throw new Error("Unauthorized");
@@ -78,7 +78,7 @@ export default function TaskDashboard() {
     if (!title.trim()) return;
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("http://localhost:8080/api/tasks", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -100,17 +100,20 @@ export default function TaskDashboard() {
   const handleToggleStatus = async (task: Task) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8080/api/tasks/${task._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/tasks/${task._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            ...task,
+            status: task.status === "completed" ? "pending" : "completed",
+          }),
         },
-        body: JSON.stringify({
-          ...task,
-          status: task.status === "completed" ? "pending" : "completed",
-        }),
-      });
+      );
       if (!res.ok) throw new Error("Unauthorized");
       const updatedTask = await res.json();
       setTasks((prev) =>
@@ -122,10 +125,13 @@ export default function TaskDashboard() {
   const handleDeleteTask = async (id: string) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8080/api/tasks/${id}`, {
-        method: "DELETE",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/tasks/${id}`,
+        {
+          method: "DELETE",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        },
+      );
       if (!res.ok) throw new Error("Unauthorized");
       setTasks((prev) => prev.filter((t) => t._id !== id));
     } catch (err) {}

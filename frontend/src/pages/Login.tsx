@@ -11,11 +11,14 @@ export default function Login() {
   const handleLogin = async () => {
     console.log("Login button clicked", { usernameOrEmail, password });
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usernameOrEmail, password }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernameOrEmail, password }),
+        },
+      );
 
       if (res.ok) {
         const data = await res.json();
