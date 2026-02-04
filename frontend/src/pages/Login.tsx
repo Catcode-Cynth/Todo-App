@@ -1,23 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./auth.css";
 
 export default function Login() {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    console.log("Login button clicked", { usernameOrEmail, password });
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usernameOrEmail, password }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernameOrEmail, password }),
+        },
+      );
 
       if (res.ok) {
-        navigate("/todo"); // ✅ redirect to Task page
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+        navigate("/task"); // ✅ redirect to Task page
       } else {
-        alert("Invalid credentials");
+        const errorData = await res.json();
+        alert(errorData.error || errorData.message || "Invalid credentials");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -25,36 +36,44 @@ export default function Login() {
   };
 
   return (
-    <div className="page-container">
-      <div className="page-card">
-        <h2>Login</h2>
-        {/* ✅ Removed <form onSubmit>, kept styling */}
-        <div className="login-form">
+    <div className="auth-container">
+      <div className="auth-title">Login</div>
+      <form
+        className="auth-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin();
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Username or Email"
+          required
+          value={usernameOrEmail}
+          onChange={(e) => setUsernameOrEmail(e.target.value)}
+        />
+        <div className="password-wrapper">
           <input
-            type="text"
-            placeholder="Username or Email"
-            required
-            value={usernameOrEmail}
-            onChange={(e) => setUsernameOrEmail(e.target.value)}
-          />
-
-          <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          {/* ✅ Button now uses onClick instead of form submit */}
-          <button type="button" className="page-btn" onClick={handleLogin}>
-            Login
-          </button>
+          <span
+            className="show-password"
+            onClick={() => setShowPassword((v) => !v)}
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
         </div>
-
-        <p className="signup-text">
-          Don’t have an account? <a href="/register">Sign up here</a>
-        </p>
+        <button type="submit" className="auth-btn">
+          Login
+        </button>
+      </form>
+      <div className="auth-link">
+        Don’t have an account? <a href="/register">Sign up here</a>
       </div>
     </div>
   );
