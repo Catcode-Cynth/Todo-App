@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
 
   preview: {
-    allowedHosts: ["https://todo-app-vzrf.onrender.com"]
+    allowedHosts: ["todo-app-vzrf.onrender.com"]
 
   }
 });
